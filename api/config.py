@@ -6,6 +6,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "postgresql://admin:password@localhost/auth-server")
 
+    if SECRET_KEY == "this-really-needs-to-be-changed":
+        print("DEFAULT SECRET KEY DETECTED!\nYou need to change the env variable AUTH_SECRET_KEY before deploying")
+
 class ProdConfig(Config):
     FLASK_ENV = "production"
     DEBUG = False
