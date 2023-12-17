@@ -5,10 +5,13 @@ from ..models import User, UserSchema, RevokedTokenModel, Verification
 import random
 import string
 from datetime import datetime, timedelta
+import os
+from api.decorators import disable_route
 
 auth_endpoint = Blueprint('auth', __name__)
 
 @auth_endpoint.route("/v1/register", methods=["POST"])
+@disable_route(os.environ.get("AUTH_ALLOW_REGISTRATION", True))
 def register():
     if not "email" or not "password" or not "name" in request.json:
         abort(422)
