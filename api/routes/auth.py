@@ -26,7 +26,10 @@ def register():
     try:
         new_user.save_to_db()
         user_id = User.find_by_email(request.json["email"]).id
-        new_verification = Verification(user_id=user_id, code=code, code_valid_until=str(datetime.now() + timedelta(days=1)))
+        if os.environ.get("AUTH_REQUIRE_VERIFICATION", True).lower() in ["true", "yes", "y"] :
+            new_verification = Verification(user_id=user_id, code=code, code_valid_until=str(datetime.now() + timedelta(days=1)))
+        else: 
+            new_verification = Verification(user_id=user_id, status="verified", code=None, code_valid_until=None)
         new_verification.save_to_db()
 
         return jsonify({'message': 'Account with email {} was created'.format(request.json["email"])}), 201
