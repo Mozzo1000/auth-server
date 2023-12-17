@@ -5,7 +5,7 @@ description = "Auth server"
 authors = ["Andreas Backström <mozzo242@gmail.com>"]
 license = "Apache-2.0"
 readme = "README.md"
-packages = [{include = "src"}]
+packages = [{include = "api"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
