@@ -7,6 +7,7 @@ import string
 from datetime import datetime, timedelta
 import os
 from api.decorators import disable_route
+import requests
 
 auth_endpoint = Blueprint('auth', __name__)
 
@@ -115,3 +116,64 @@ def user_logout_refresh():
         return jsonify({'message': 'Refresh token has been revoked'}), 201
     except:
         return jsonify({'message': 'Something went wrong'}), 500
+
+
+"""
+NOTE: This is a quick n dirty way of adding a authorized redirect URI route for Google OAuth authentication.
+How this is used is a frontend, ex Web app requests an authorization code from Google when a user is trying to login. When the frontend 
+recieves a code from Google, the frontend then sends the code to this route to verify that the code is valid and if valid the route will login 
+the user in the same way as manual login routes above. If the user does not exist it will create a user automatically.
+
+This function reuses a lot of code from the login and register routes. It also completly ignores the verification process and will automatically assume 
+the user is verified (we could use the verified key that the OAuth response from Google sends us instead).
+
+"""
+@auth_endpoint.route("/v1/authorize/google", methods=['GET','POST'])
+def authorize_google():
+    auth_code = request.get_json()['code']
+
+    data = {
+        'code': auth_code,
+        'client_id': os.getenv("GOOGLE_CLIENT_ID"),  # client ID from the credential at google developer console
+        'client_secret': os.getenv("GOOGLE_CLIENT_SECRET"),  # client secret from the credential at google developer console
+        'redirect_uri': 'postmessage',
+        'grant_type': 'authorization_code'
+    }
+
+    response = requests.post('https://oauth2.googleapis.com/token', data=data).json()
+    headers = {
+        'Authorization': f'Bearer {response["access_token"]}'
+    }
+    user_info = requests.get('https://www.googleapis.com/oauth2/v3/userinfo', headers=headers).json()
+    print(user_info)
+    # CREATE USER AND THEN SEND BACK NORMAL ACCESS TOKEN, SAME AS WITH NORMAL LOGIN
+    current_user = User.find_by_email(user_info["email"])
+    if not current_user:
+        #CREATE A NEW USER
+        print("CREATE NEW USER")
+        random_pass = "".join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=32))
+
+        new_user = User(email=user_info["email"], password=User.generate_hash(random_pass), name=user_info["name"])
+
+        new_user.save_to_db()
+        user_id = User.find_by_email(user_info["email"])
+        new_verification = Verification(user_id=user_id.id, status="verified", code=None, code_valid_until=None)
+        new_verification.save_to_db()
+
+        access_token = create_access_token(identity=user_id.email, additional_claims={"role": user_id.role})
+        refresh_token = create_refresh_token(identity=user_id.email)
+
+        user_schema = UserSchema()
+        json_output = user_schema.dump(user_id)
+        json_output.update({'access_token': access_token, 'refresh_token': refresh_token})
+        return jsonify(json_output), 201
+    if current_user and current_user.status == "active":
+        access_token = create_access_token(identity=user_info['email'], additional_claims={"role": current_user.role})
+        refresh_token = create_refresh_token(identity=user_info['email'])
+
+        user_schema = UserSchema()
+        json_output = user_schema.dump(current_user)
+        json_output.update({'access_token': access_token, 'refresh_token': refresh_token})
+        return jsonify(json_output), 201
+    elif current_user and current_user.status == "inactive":
+        return jsonify({'message': 'Account has been inactivated, contact administrator for more information.'}), 403
