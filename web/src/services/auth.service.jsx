@@ -25,6 +25,15 @@ const login = (email, password) => {
         });
 };
 
+const loginGoogle = (code) => {
+    return axios.post(API_URL + "/v1/authorize/google", {code}).then((response) => {
+        if (response.data.access_token) {
+            localStorage.setItem("auth_user", JSON.stringify(response.data));
+        }
+        return response.data
+    })
+}
+
 const logout = () => {
     /*TODO: Send logout request to auth-server so the token get invalidated. */
     localStorage.removeItem("auth_user");
@@ -47,4 +56,5 @@ export default {
     logout,
     getCurrentUser,
     verify,
+    loginGoogle,
 };

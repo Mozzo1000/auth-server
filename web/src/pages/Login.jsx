@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import AuthService from '../services/auth.service';
-import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
+import { Button, Label, TextInput } from 'flowbite-react';
+import GoogleLoginButton from '../components/GoogleLoginButton';
 
 function Login() {
     const [username, setUsername] = useState("");
@@ -23,6 +24,7 @@ function Login() {
   return (
     <>
       <h1>Login</h1>
+      <GoogleLoginButton />
       <form className="flex max-w-md flex-col gap-4" onSubmit={handleLogin}>
         <div>
           <div className="mb-2 block">
