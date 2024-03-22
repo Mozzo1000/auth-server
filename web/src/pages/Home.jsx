@@ -17,7 +17,10 @@ function Home() {
         ):(
             <>
             <p>Not logged in</p>
-            <Button as={Link} to="/login">Login</Button>
+            <Link to="/login" style={{display: 'inline-block'}}>
+              <Button>Login</Button>
+            </Link>
+
             </>
         )}
     </div>
