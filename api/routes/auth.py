@@ -76,7 +76,7 @@ def login():
     if User.verify_hash(request.json["password"], current_user.password) and current_user.status == "active":
         if current_user.verification.status != "verified":
             return jsonify({'message': 'Account has not been verified.'}), 403
-        access_token = create_access_token(identity=request.json['email'], additional_claims={"role": current_user.role})
+        access_token = create_access_token(identity=request.json['email'], additional_claims={"role": current_user.role,  "id": current_user.id})
         refresh_token = create_refresh_token(identity=request.json['email'])
 
         user_schema = UserSchema()
@@ -91,7 +91,7 @@ def login():
 @auth_endpoint.route('/v1/token/refresh', methods=['POST'])
 def token_refresh():
     current_user = get_jwt_identity()
-    access_token = create_access_token(identity=current_user)
+    access_token = create_access_token(identity=current_user, additional_claims={"role": current_user.role,  "id": current_user.id})
     return jsonify({'access_token': access_token}), 201
 
 @auth_endpoint.route('/v1/token/logout/access', methods=['POST'])
@@ -160,7 +160,7 @@ def authorize_google():
         new_verification = Verification(user_id=user_id.id, status="verified", code=None, code_valid_until=None)
         new_verification.save_to_db()
 
-        access_token = create_access_token(identity=user_id.email, additional_claims={"role": user_id.role})
+        access_token = create_access_token(identity=user_id.email, additional_claims={"role": user_id.role, "id": user_id.id})
         refresh_token = create_refresh_token(identity=user_id.email)
 
         user_schema = UserSchema()
@@ -168,7 +168,7 @@ def authorize_google():
         json_output.update({'access_token': access_token, 'refresh_token': refresh_token})
         return jsonify(json_output), 201
     if current_user and current_user.status == "active":
-        access_token = create_access_token(identity=user_info['email'], additional_claims={"role": current_user.role})
+        access_token = create_access_token(identity=user_info['email'], additional_claims={"role": current_user.role, "id": current_user.id})
         refresh_token = create_refresh_token(identity=user_info['email'])
 
         user_schema = UserSchema()
