@@ -22,6 +22,11 @@
 This project started out when I noticied I rebuilt the same functionality over and over again across different projects. With time, these projects slowly drifted away in terms of functionality and how the authentication flow worked, leaving me with harder to maintain projects. `Auth Server` is a combination of all those efforts so I can easily get the same authentication functionality across all my projects just by spinning up a docker container.
 
 ## Usage
+
+### Run with docker
+Run `docker compose up` to spin up the API and accompanying postgres database.
+By default the database is configured to be listening on port `5433` and the API on port `5001`. This can be changed in the `docker-compose.yml` file.
+
 ### Examples
 You can find example projects that utilize the functionality of `Auth Server` in the [example](example) folder.
 
