@@ -12,5 +12,5 @@ ENV FLASK_ENV production
 
 EXPOSE 5000
 CMD ["gunicorn", "-b", ":5000", "api.app:app"]
-
+RUN ["chmod", "+x", "/app/entrypoint.sh"]
 ENTRYPOINT ["/app/entrypoint.sh"]
