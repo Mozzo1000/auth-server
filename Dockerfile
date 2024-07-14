@@ -1,7 +1,7 @@
 FROM python:3.12.4
 WORKDIR /app
 
-COPY .env README.md pyproject.toml entrypoint.sh ./
+COPY README.md pyproject.toml entrypoint.sh ./
 COPY migrations ./migrations
 COPY api ./api
 
