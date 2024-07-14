@@ -6,6 +6,11 @@ services:
         ports:
             - 5433:5432
         restart: always
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
         env_file:
             - .env
         volumes:
@@ -15,7 +20,8 @@ services:
         build: .
         image: auth-server-api
         depends_on:
-            - "db"
+            db:
+              condition: service_healthy
         env_file:
             - .env
         ports:

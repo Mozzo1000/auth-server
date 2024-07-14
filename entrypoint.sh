@@ -1,16 +1,6 @@
 #!/bin/sh
 
-if [ "$DATABASE" = "auth-server" ]
-then
-    echo "Waiting for postgres..."
-
-    while ! nc -z $POSTGRES_HOST $POSTGRES_PORT; do
-      sleep 0.1
-    done
-
-    echo "PostgreSQL started"
-fi
-
+echo "Running migration.."
 python -m flask db upgrade
-
-exec "$@"
+echo "Startin gunicorn.."
+exec gunicorn -w 4 -b :5000 api.app:app
