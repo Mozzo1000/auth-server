@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 class Config:
     CSRF_ENABLED = True
@@ -13,7 +14,7 @@ class ProdConfig(Config):
     FLASK_ENV = "production"
     DEBUG = False
     TESTING = False
-    JWT_ACCESS_TOKEN_EXPIRES = True
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=5)
 
 class DevConfig(Config):
     FLASK_ENV = "development"
