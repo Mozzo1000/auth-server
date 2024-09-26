@@ -1,5 +1,6 @@
-FROM python:3.12.4
+FROM python:3.12.4-alpine
 WORKDIR /app
+RUN apk add build-base libpq libpq-dev
 
 COPY README.md pyproject.toml entrypoint.sh ./
 COPY migrations ./migrations
