@@ -1,30 +1,10 @@
 # docker-compose.yml
 services:
-    db:
-        container_name: "auth-server-db"
-        image: "postgres" # use latest official postgres version
-        ports:
-            - 5433:5432
-        restart: always
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
-            interval: 10s
-            timeout: 5s
-            retries: 5
-        env_file:
-            - .env
-        volumes:
-            - auth-server:/var/lib/postgresql/db-data/ # persist data even if container shuts down
     api:
         container_name: "auth-server-api"
         build: .
         image: auth-server-api
-        depends_on:
-            db:
-              condition: service_healthy
         env_file:
             - .env
         ports:
             - 5001:5000
-volumes:
-    auth-server:
