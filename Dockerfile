@@ -7,7 +7,7 @@ COPY migrations ./migrations
 COPY api ./api
 
 RUN pip install .
-ENV FLASK_ENV production
+ENV FLASK_ENV=production
 RUN chmod +x entrypoint.sh
 
 EXPOSE 5000
