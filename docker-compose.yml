@@ -4,7 +4,12 @@ services:
         container_name: "auth-server-api"
         build: .
         image: auth-server-api
+        volumes:
+            - auth_db_vol:/app/instance
         env_file:
             - .env
         ports:
             - 5001:5000
+
+volumes:
+    auth_db_vol:
