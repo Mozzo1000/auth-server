@@ -2,8 +2,7 @@
 services:
     api:
         container_name: "auth-server-api"
-        build: .
-        image: auth-server-api
+        image: mozzo/auth-server:1.0.0
         volumes:
             - auth_db_vol:/app/instance
         env_file:
