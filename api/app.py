@@ -7,6 +7,7 @@ from api.config import DevConfig, ProdConfig
 import os
 from api.routes.auth import auth_endpoint
 from api.routes.user import user_endpoint
+from api.commands.user import user_command
 
 app = Flask(__name__)
 CORS(app)
@@ -22,6 +23,8 @@ jwt = JWTManager(app)
 
 app.register_blueprint(auth_endpoint)
 app.register_blueprint(user_endpoint)
+
+app.register_blueprint(user_command)
 
 @app.route("/")
 def index():
