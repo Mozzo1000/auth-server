@@ -3,7 +3,7 @@ import click
 from getpass import getpass
 import sys
 import re
-from api.models import User
+from api.models import User, Verification
 
 user_command = Blueprint('user', __name__)
 
@@ -44,8 +44,14 @@ def create_user(email, name, role, password):
         sys.exit(1)
     
     new_user = User(email=email, password=User.generate_hash(set_password), name=name, role=role)
+
     try:
         new_user.save_to_db()
+        try:
+            new_verification = Verification(user_id=new_user.id, status="verified", code=None, code_valid_until=None)
+            new_verification.save_to_db()
+        except:
+            print("Could not create user because of failure with verification")
         print(f"Successfully created a new user:\n\tEmail: {email}\n\tName: {name}\n\tRole: {role}")
     except:
         print("Could not save new user to database.")
